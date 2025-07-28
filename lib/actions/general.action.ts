@@ -8,6 +8,12 @@ import {generateObject} from "ai";
 export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
     console.log('Fetching interviews for user:', userId);
     
+    // Check if Firebase is properly initialized
+    if (!db) {
+        console.error('Firebase Admin not properly initialized');
+        return null;
+    }
+    
     try {
         const interviews = await db
             .collection('interviews')
@@ -33,6 +39,12 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
     const { userId, limit = 20 } = params;
     
     console.log('Fetching latest interviews excluding user:', userId);
+
+    // Check if Firebase is properly initialized
+    if (!db) {
+        console.error('Firebase Admin not properly initialized');
+        return null;
+    }
 
     try {
         const interviews = await db
@@ -68,6 +80,12 @@ export async function getInterviewById(id: string): Promise<Interview | null> {
 
 export async function createFeedback(params: CreateFeedbackParams) {
     const { interviewId, userId, transcript } = params;
+
+    // Check if Firebase is properly initialized
+    if (!db) {
+        console.error('Firebase Admin not properly initialized');
+        return { success: false };
+    }
 
     try {
         const formattedTranscript = transcript.map((sentence: { role: string, content: string }) => (
@@ -121,6 +139,12 @@ export async function createFeedback(params: CreateFeedbackParams) {
 
 export async function getFeedbackByInterviewId(params: GetFeedbackByInterviewIdParams): Promise<Feedback | null> {
     const { interviewId, userId } = params;
+
+    // Check if Firebase is properly initialized
+    if (!db) {
+        console.error('Firebase Admin not properly initialized');
+        return null;
+    }
 
     const feedback = await db
         .collection('feedback')

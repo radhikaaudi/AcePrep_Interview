@@ -97,6 +97,12 @@ export async function getCurrentUser(): Promise<User | null> {
 
     if(!sessionCookie) return null;
 
+    // Check if Firebase is properly initialized
+    if (!auth || !db) {
+        console.error('Firebase Admin not properly initialized');
+        return null;
+    }
+
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
