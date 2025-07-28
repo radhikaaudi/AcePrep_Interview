@@ -8,20 +8,25 @@ import {generateObject} from "ai";
 export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
     console.log('Fetching interviews for user:', userId);
     
-    const interviews = await db
-        .collection('interviews')
-        .where('userId', '==', userId)
-        .orderBy('createdAt', 'desc')
-        .get();
+    try {
+        const interviews = await db
+            .collection('interviews')
+            .where('userId', '==', userId)
+            .orderBy('createdAt', 'desc')
+            .get();
 
-    const userInterviews = interviews.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-    })) as Interview[];
-    
-    console.log('Found interviews for user:', userInterviews.length);
-    
-    return userInterviews;
+        const userInterviews = interviews.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Interview[];
+        
+        console.log('Found interviews for user:', userInterviews.length);
+        
+        return userInterviews;
+    } catch (error) {
+        console.error('Error fetching interviews for user:', userId, error);
+        return null;
+    }
 }
 
 export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
@@ -29,22 +34,27 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
     
     console.log('Fetching latest interviews excluding user:', userId);
 
-    const interviews = await db
-        .collection('interviews')
-        .orderBy('createdAt', 'desc')
-        .where('finalized', '==', true)
-        .where('userId', '!=', userId)
-        .limit(limit)
-        .get();
+    try {
+        const interviews = await db
+            .collection('interviews')
+            .orderBy('createdAt', 'desc')
+            .where('finalized', '==', true)
+            .where('userId', '!=', userId)
+            .limit(limit)
+            .get();
 
-    const latestInterviews = interviews.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data()
-    })) as Interview[];
-    
-    console.log('Found latest interviews:', latestInterviews.length);
-    
-    return latestInterviews;
+        const latestInterviews = interviews.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data()
+        })) as Interview[];
+        
+        console.log('Found latest interviews:', latestInterviews.length);
+        
+        return latestInterviews;
+    } catch (error) {
+        console.error('Error fetching latest interviews:', error);
+        return null;
+    }
 }
 
 export async function getInterviewById(id: string): Promise<Interview | null> {
