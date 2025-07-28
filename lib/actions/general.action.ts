@@ -6,20 +6,28 @@ import {feedbackSchema} from "@/constants";
 import {generateObject} from "ai";
 
 export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
+    console.log('Fetching interviews for user:', userId);
+    
     const interviews = await db
         .collection('interviews')
         .where('userId', '==', userId)
         .orderBy('createdAt', 'desc')
         .get();
 
-    return interviews.docs.map((doc) => ({
+    const userInterviews = interviews.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
     })) as Interview[];
+    
+    console.log('Found interviews for user:', userInterviews.length);
+    
+    return userInterviews;
 }
 
 export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
     const { userId, limit = 20 } = params;
+    
+    console.log('Fetching latest interviews excluding user:', userId);
 
     const interviews = await db
         .collection('interviews')
@@ -29,10 +37,14 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
         .limit(limit)
         .get();
 
-    return interviews.docs.map((doc) => ({
+    const latestInterviews = interviews.docs.map((doc) => ({
         id: doc.id,
         ...doc.data()
     })) as Interview[];
+    
+    console.log('Found latest interviews:', latestInterviews.length);
+    
+    return latestInterviews;
 }
 
 export async function getInterviewById(id: string): Promise<Interview | null> {

@@ -12,7 +12,10 @@ export async function GET(){
 {status:200})
 }
 export async function POST(request: Request) {
-    const {type, role, level, techstack, amount, userid} = await request.json();
+    const { type, role, level, techstack, amount, userid } = await request.json();
+    
+    console.log('Received data:', { type, role, level, techstack, amount, userid });
+    
   try{
     const { text: questions } = await generateText({
             model: google("gemini-2.0-flash-001"),
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
             role, type, level,
             techstack: techstack.split(','),
             questions: JSON.parse(questions),
-            userId: userid,
+            userId: userid, // Make sure this is the correct user ID
             finalized: true,
             coverImage: getRandomInterviewCover(),
             createdAt: new Date().toISOString()
@@ -44,7 +47,12 @@ export async function POST(request: Request) {
 
         await db.collection("interviews").add(interview);
 
-        return Response.json({ success: true}, {status: 200})
+        console.log('Interview created successfully for user:', userid);
+        
+        return Response.json({ 
+            success: true,
+            message: 'Interview created successfully'
+        }, { status: 200 });
     }
   catch(error){
     console.error(error);
